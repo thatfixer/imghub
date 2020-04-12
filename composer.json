@@ -1,0 +1,30 @@
+{
+    "name": "thatfixer/imghub",
+    "description": "A simple image hub.",
+    "type": "library",
+    "require": {
+        "guzzlehttp/guzzle": "^6.5",
+        "ext-json": "*",
+        "doctrine/cache": "1.6.2",
+        "ext-fileinfo": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Imghub\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Imghub\\Tests\\": "src/tests"
+        }
+    },
+    "authors": [
+        {
+            "name": "thatfixer",
+            "email": "thatfixer@gmail.com"
+        }
+    ]
+}
