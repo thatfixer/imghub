@@ -25,6 +25,14 @@ class ExceptionTest extends ImghubTestCase
      */
     public function testOutMimeLimitException()
     {
-        \Imghub\Imghub::hub('baidu')->upload(dirname(__DIR__) . '/data/example.txt')->url();
+        \Imghub\Imghub::hub('alibaba')->upload(dirname(__DIR__) . '/data/example.txt')->url();
+    }
+
+    /**
+     * @expectedException \Imghub\Exceptions\BadCacheDirectoryException
+     */
+    public function testBadCacheDirectoryException()
+    {
+        \Imghub\Imghub::hub('netease')->setCacheDir(DIRECTORY_SEPARATOR)->upload(dirname(__DIR__) . '/data/example.jpg')->url();
     }
 }

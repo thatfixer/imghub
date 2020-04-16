@@ -5,21 +5,11 @@ namespace Imghub\Hubs;
 use Imghub\Exceptions\BadResponseException;
 use Imghub\ImghubAbstract;
 
-class Baidu extends ImghubAbstract
+class Alibaba extends ImghubAbstract
 {
-    const URL_UPLOAD_FILE = 'http://baike.baidu.com/api/common/uploadimage';
+    const URL_UPLOAD_FILE = 'https://kfupload.alibaba.com/mupload';
 
-    protected $sizeLimit = 10485760; //10MB
-
-    protected $mimeLimit = [
-        'image/jpeg',
-        'image/png',
-        'image/gif',
-        'image/pjpeg',
-        'image/x-png',
-        'image/webp',
-        'application/octet-stream',
-    ];
+    protected $sizeLimit = 5242880; //5MB
 
     /**
      * @return string
@@ -39,17 +29,21 @@ class Baidu extends ImghubAbstract
                     'filename' => $this->fakeFileName(),
                 ],
                 [
-                    'name' => 'echo',
-                    'contents' => 1,
+                    'name' => 'name',
+                    'contents' => $this->fakeFileName(),
+                ],
+                [
+                    'name' => 'scene',
+                    'contents' => 'aeMessageCenterV2ImageRule',
                 ]
             ]
         ]);
 
         $data = json_decode($response->getBody());
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (json_last_error() !== JSON_ERROR_NONE || $data->code != 0) {
             throw new BadResponseException('Get url failed: ' . $response->getBody());
         }
 
-        return $data->picUrl;
+        return $data->url;
     }
 }

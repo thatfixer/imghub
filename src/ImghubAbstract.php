@@ -2,8 +2,11 @@
 
 namespace Imghub;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\PhpFileCache;
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
+use Imghub\Exceptions\BadCacheDirectoryException;
 use Imghub\Exceptions\FileNotFoundException;
 use Imghub\Exceptions\OutMimeLimitException;
 use Imghub\Exceptions\OutSizeLimitException;
@@ -12,23 +15,29 @@ abstract class ImghubAbstract implements ImghubInterface
 {
     const USER_AGENT = 'Imghub/0.0.1';
 
-    public $tokenLifeTime = 0;
+    protected $tokenLifeTime = 0;
 
-    public $sizeLimit = 0;
+    protected $sizeLimit = 0;
 
-    public $mimeLimit = [
+    protected $mimeLimit = [
         'image/jpeg',
         'image/png',
         'image/gif'
     ];
 
-    public $tempFile;
+    protected $tempFile;
 
-    public static $httpClient;
+    /**
+     * @var ClientInterface
+     */
+    protected static $httpClient;
 
-    public static $cacheClient;
+    /**
+     * @var CacheProvider
+     */
+    protected static $cacheClient;
 
-    public function __construct($httpClient = null, $cacheClient = null)
+    public function __construct(ClientInterface $httpClient = null)
     {
         if (is_null(self::$httpClient)) {
             self::$httpClient = ! is_null($httpClient)
@@ -40,12 +49,25 @@ abstract class ImghubAbstract implements ImghubInterface
                     ]
                 ]);
         }
+    }
 
-        if (is_null(self::$cacheClient)) {
-            self::$cacheClient = ! is_null($cacheClient)
-                ? $cacheClient
-                : new PhpFileCache(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'cache');
+    /**
+     * @param string $cacheDir
+     * @return ImghubAbstract
+     * @throws BadCacheDirectoryException
+     */
+    public function setCacheDir($cacheDir)
+    {
+        if (! is_dir($cacheDir)) {
+            throw new BadCacheDirectoryException('Directory not found: ' . $cacheDir);
         }
+
+        if (! is_writeable($cacheDir)) {
+            throw new BadCacheDirectoryException('Directory not writeable: ' . $cacheDir);
+        }
+
+        self::$cacheClient = new PhpFileCache($cacheDir);
+        return $this;
     }
 
     /**

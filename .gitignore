@@ -1,4 +1,2 @@
 vendor
-src/data/cache/*
-!src/data/cache/.gitkeep
 composer.lock

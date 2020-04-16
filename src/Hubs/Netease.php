@@ -13,9 +13,9 @@ class Netease extends ImghubAbstract
 
     const TOKEN_CACHE_KEY = 'netease.token';
 
-    public $tokenLifeTime = 300; //5minute
+    protected $tokenLifeTime = 300; //5minute
 
-    public $sizeLimit = 3145728; //3MB
+    protected $sizeLimit = 3145728; //3MB
 
     /**
      * @return string
@@ -23,6 +23,10 @@ class Netease extends ImghubAbstract
      */
     public function url()
     {
+        if ($this->tempFile) {
+            throw new BadResponseException('Please upload file.');
+        }
+
         $token = $this->getToken();
 
         $response = self::$httpClient->post(self::URL_UPLOAD_FILE, [
@@ -58,7 +62,7 @@ class Netease extends ImghubAbstract
      */
     protected function getToken()
     {
-        $token = self::$cacheClient->fetch(self::TOKEN_CACHE_KEY);
+        $token = self::$cacheClient ? self::$cacheClient->fetch(self::TOKEN_CACHE_KEY) : null;
 
         if (! $token) {
             $response = self::$httpClient->get(self::URL_GET_TOKEN);
@@ -68,7 +72,7 @@ class Netease extends ImghubAbstract
             }
 
             $token = $data->token;
-            self::$cacheClient->save(self::TOKEN_CACHE_KEY, $token, $this->tokenLifeTime);
+            self::$cacheClient && self::$cacheClient->save(self::TOKEN_CACHE_KEY, $token, $this->tokenLifeTime);
         }
 
         return $token;
