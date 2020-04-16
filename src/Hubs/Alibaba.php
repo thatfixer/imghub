@@ -17,8 +17,8 @@ class Alibaba extends ImghubAbstract
      */
     public function url()
     {
-        if ($this->tempFile) {
-            throw new BadResponseException('Please upload file.');
+        if (! $this->tempFile) {
+            throw new BadResponseException('Please upload a file');
         }
 
         $response = self::$httpClient->post(self::URL_UPLOAD_FILE, [
